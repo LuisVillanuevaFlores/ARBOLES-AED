@@ -16,9 +16,9 @@ class RBtree
    public :
       RBtree()
       {
-              root=NULL;
+              root=nullptr;
       }
-      void insert(node * );
+      void insert(int);
       void insertfix(node *);
       void leftrotate(node *);
       void rightrotate(node *);
@@ -29,123 +29,108 @@ class RBtree
       void disp();
       void display( node *);
 };
-void RBtree::insert(node *z)
+void RBtree::insert(int clave)
 {
-	//recibimos clave y lo almacenamos en un nodo
-  int clave;cin>>clave;
-	z->key=clave;
-  
-	 //ahora seguimos con el algotimo de insercion
-     node *y=NULL;
-     node *x=root;
+    cout<<clave<<endl;
+  //recibimos clave y lo almacenamos en un nodo
+    node *z=new node;
+    z->key=clave;
+    z->color='r';
 
-     if(root==NULL){
-        root=z;
-        z->parent=NULL;
-     }
+    z->left=z->right=z->parent=nullptr;
 
-     else{
-     while(x!=NULL){
-        y=x;  
-    
-        if(z->key<x->key){x=x->left;}
-        else{x=x->right;}
+   //ahora seguimos con el algotimo de insercion
+     node *y=nullptr;
+     node *x=this->root;
+
+
+    while(x!=nullptr){
+        y=x;
+        if(z->key<x->key){
+            x=x->left;
+        }
+        else
+            x=x->right;
     }
-   
+
     z->parent=y;
-   
+
     //Si el padre que es y, es null indica que aun no se han insertado nodos,entonces se inserta en la raiz
-    if(y==NULL){root=z;}
-    else if(z->key<y->key){y->left=z;}
+    if(y==nullptr){
+        this->root=z;}
+    else if(z->key<y->key){
+        y->left=z;}
     else{
-    
+
       y->right=z;
     }
-   }
-    z->left=NULL;
-    z->right=NULL;
+
+    z->left=nullptr;
+    z->right=nullptr;
+    z->color='r';
     /* Al nuevo nodo se le da el color rojo,de esta manera no se viola ninguna condicion
     a excepcion de la primera(el padre del nodo insertado puede ser rojo),se llama a insertfix*/
 
 
-    z->color='r';
 
      insertfix(z);
 }
 
 void RBtree::insertfix(node *z)
 {
+    cout<<z->key<<endl;
      node *u;
-     if(root==z){
-      z->color='b';return;
 
-     }
-    
-     while(z->parent!=NULL && z->parent->color=='r'){
-      if(z->parent==NULL){break;}
-
+     while(z->parent!=nullptr && z->parent->color=='r'){
         if(z->parent==z->parent->parent->left){
-
-          if(z->parent->parent->right!=NULL){
             u=z->parent->parent->right;
-            if(u->color=='r'){
-              
+            if( u!=nullptr && u->color=='r'){
+
                 z->parent->color='b';
                 u->color='b';
                 z->parent->parent->color='r';
                 z=z->parent->parent;
             }
-          }
-            else
-            { 
-              if(z->parent->right==z){ 
+
+            else if(z->parent->right==z){
                   z=z->parent;
                   leftrotate(z);
                 }
+            else{
                   z->parent->color='b';
                   z->parent->parent->color='r';
                   rightrotate(z->parent->parent);
             }
           }
 
-        else{ 
-            if(z->parent->parent->left!=NULL)
-            {
-              u=z->parent->parent->left;
-              if(u->color=='r'){
+        else{
+            u=z->parent->parent->left;
+            if( u!=nullptr && u->color=='r'){
+
                 z->parent->color='b';
                 u->color='b';
                 z->parent->parent->color='r';
                 z=z->parent->parent;
-              }
-          }
-          else {
-            if(z==z->parent->left){
-              z=z->parent;
-              rightrotate(z);
             }
-            z->parent->color='b';
-             z->parent->parent->color='r';
-            leftrotate(z->parent->parent);
-          }
+
+            else if(z->parent->left==z){
+                  z=z->parent;
+                  rightrotate(z);
+                }
+            else{
+                  z->parent->color='b';
+                  z->parent->parent->color='r';
+                  leftrotate(z->parent->parent);
+            }
 
         }
-
+     }
      root->color='b';
-  
-  }
 }
 
 
-    
-     
-
-
-
-
-
 void RBtree::transplant(node *u,node*v){
-      if(u->parent==NULL){
+      if(u->parent==nullptr){
         root=v;
       }
       else if(u==u->parent->left){
@@ -157,69 +142,65 @@ void RBtree::transplant(node *u,node*v){
 
 }
 
-
-
-
-
 void RBtree::del(int clave)
 {
-    
 
-	    node *x;
-	    char ycor;		
+
+      node *x;
+      char ycor;
       node *y;
       node *z=root;
-      
 
-      while(z!=NULL)
+
+      while(z!=nullptr)
       {
         if(z->key>clave){z=z->right;}
         else if(z->key<clave){z=z->left;}
         else{break;}
 
       }
-      if(z==NULL){return;}
+      if(z==nullptr){return;}
 
 
       y=z;
       ycor=y->color;
-      if(z->left==NULL){
-      		x=z->right;
-      		transplant(z,z->right);
+      if(z->left==nullptr){
+          x=z->right;
+          transplant(z,z->right);
       }
-      else if(z->right==NULL){
-      		x=z->left;
-      		transplant(z,z->left);
+      else if(z->right==nullptr){
+          x=z->left;
+          transplant(z,z->left);
       }
       else{
-      		y=tree_minimum(z->right);
-      		ycor=y->color;
-      		x=y->right;
-      		if(y->parent==z){x->parent=y;}
-      		else{
-      			transplant(y,y->right);
-      			y->right=z->right;
-      			y->right->parent=y;
-      		}
-      		transplant(z,y);
-      		y->left=z->left;
-      		y->left->parent=y;
-      		y->color=z->color;
+          y=tree_minimum(z->right);
+          ycor=y->color;
+          x=y->right;
+          if(y->parent==z){x->parent=y;}
+          else{
+            transplant(y,y->right);
+            y->right=z->right;
+            y->right->parent=y;
+          }
+          transplant(z,y);
+          y->left=z->left;
+          y->left->parent=y;
+          y->color=z->color;
 
 
       }
       delete z;
       if(ycor=='b'){
-      	delfix(x);
+        delfix(x);
       }
 
     }
-  
+
 
 
 
 node* RBtree::tree_minimum(node *x){
-      while(x->left!=NULL){x=x->left;}
+      while(x->left!=nullptr){x=x->left;}
       return x;
 
 
@@ -229,36 +210,36 @@ node* RBtree::tree_minimum(node *x){
 
 void RBtree::delfix(node *x)
 {
-	node *w=new node;
-	while(x!=root && x->color=='b'){
-		if(x==x->parent->left){
-				w=x->parent->right;
-				if(w->color=='r'){
-					w->color='b';
-					x->parent->color='r';
-					leftrotate(x->parent);
-					w=x->parent->right;
-				}
-				if( w->left->color=='b'&&  w->right->color=='b'){
-					w->color='r';
-					x=x->parent;
-				}
+  node *w=new node;
+  while(x!=root && x->color=='b'){
+    if(x==x->parent->left){
+        w=x->parent->right;
+        if(w->color=='r'){
+          w->color='b';
+          x->parent->color='r';
+          leftrotate(x->parent);
+          w=x->parent->right;
+        }
+        if( w->left->color=='b'&&  w->right->color=='b'){
+          w->color='r';
+          x=x->parent;
+        }
 
-				else {
+        else {
           if( w->right->color=='b'){
-						w->left->color='b';
-						w->color='r';	
-						rightrotate(w);
-						w=x->parent->right;
+            w->left->color='b';
+            w->color='r';
+            rightrotate(w);
+            w=x->parent->right;
            }
-					w->color=x->parent->color;
-					x->parent->color='b';
-					w->right->color='b';
-					leftrotate(x->parent);
-					x=root;
+          w->color=x->parent->color;
+          x->parent->color='b';
+          w->right->color='b';
+          leftrotate(x->parent);
+          x=root;
 
-				}
-		}
+        }
+    }
 
     else{
 
@@ -277,7 +258,7 @@ void RBtree::delfix(node *x)
         else {
           if( w->left->color=='b'){
             w->right->color='b';
-            w->color='r'; 
+            w->color='r';
             leftrotate(w);
             w=x->parent->left;
            }
@@ -292,10 +273,10 @@ void RBtree::delfix(node *x)
 
     }
 
-	
-	}
 
-	x->color='b';
+  }
+
+  x->color='b';
 
 
 
@@ -309,9 +290,9 @@ void RBtree::leftrotate(node *x)
      node *y=new node;
      y=x->right;
      x->right=y->left;
-     if(y->left!=NULL){y->left->parent=x;}
+     if(y->left!=nullptr){y->left->parent=x;}
      y->parent=x->parent;
-     if(x->parent==NULL){root=y;}
+     if(x->parent==nullptr){root=y;}
      else{x->parent->right=y;}
      y->left=x;
      x->parent=y;
@@ -324,9 +305,9 @@ void RBtree::rightrotate(node *x)
      node *y=new node;
      y=x->left;
      x->left=y->right;
-     if(y->right!=NULL){y->right->parent=x;}
+     if(y->right!=nullptr){y->right->parent=x;}
      y->parent=x->parent;
-     if(x->parent==NULL){root=y;}
+     if(x->parent==nullptr){root=y;}
      else{x->parent->left=y;}
      y->right=x;
      x->parent=y;
@@ -341,12 +322,12 @@ void RBtree::disp()
 }
 void RBtree::display(node *p)
 {
-     if(root==NULL)
+     if(root==nullptr)
      {
           cout<<"\nARBOL VACIO.";
           return ;
      }
-     if(p!=NULL)
+     if(p!=nullptr)
      {
                 cout<<"\n\t NODO: ";
                 cout<<"\n LLAVE: "<<p->key;
@@ -355,14 +336,14 @@ void RBtree::display(node *p)
      cout<<"Black";
     else
      cout<<"Red";
-                if(p->parent!=NULL)
+                if(p->parent!=nullptr)
                        cout<<"\n Padre: "<<p->parent->key;
-              
-                if(p->right!=NULL)
+
+                if(p->right!=nullptr)
                        cout<<"\n Hijo derecho: "<<p->right->key;
                 else
                        cout<<"\n Este no tiene hijo derecho .  ";
-                if(p->left!=NULL)
+                if(p->left!=nullptr)
                        cout<<"\n Hijo izquierdo: "<<p->left->key;
                 else
                        cout<<"\n Este no tiene hijo izquierdo .  ";
@@ -392,10 +373,10 @@ void RBtree::display(node *p)
 
 int main()
 {
-//7 8 3 2 1 11 15 
-    
-RBtree arbol;
+//7 8 3 2 1 11 15
 
+RBtree arbol;
+/*
 node *a=new node;
 node *b=new node;
 node *c=new node;
@@ -403,7 +384,8 @@ node *d=new node;
 node *e=new node;
 node *f=new node;
 node *g=new node;
-
+node *h=new node;
+node *i=new node;
 
 arbol.insert(a);
 arbol.insert(b);
@@ -412,13 +394,15 @@ arbol.insert(d);
 arbol.insert(e);
 arbol.insert(f);
 arbol.insert(g);
+arbol.insert(h);
+arbol.insert(i);
 
 
-
-arbol.disp();
-arbol.del(7);
+*/
+//arbol.disp();
+//arbol.del(7);
 cout<<"**************************************"<<endl;
-arbol.disp();
+//arbol.disp();
 //cout<<"**************************************"<<endl;
 
 //arbol.del(2);
@@ -426,24 +410,16 @@ arbol.disp();
 
 
 
-/*
-
-arbol.insert(7);
-arbol.insert(8);
-arbol.insert(3);
-arbol.insert(2);
-arbol.insert(1);
-arbol.insert(11);
-arbol.insert(15);
-arbol.insert(0);
-arbol.insert(-1);
-arbol.insert(16);
-arbol.insert(17);
-arbol.insert(18);
+for(int i=1;i<=10;i++){
+    arbol.insert(i);
+}
 arbol.disp();
+//arbol.del(4);
+cout<<"**************************************"<<endl;
+//arbol.disp();
 
 
-*/
+
 
 
 
